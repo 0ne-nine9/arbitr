@@ -98,8 +98,7 @@ class GoogleScraper:
             'cable landing station', 'backbone network',
             'microwave link', 'satellite link',
             'routing outage', 'BGP hijack',
-            'cable cut', 'telecom sabotage',
-            'network disruption', 'anchor'
+            'cable cut','network disruption', 'anchor'
         ],
         
         'finance': 
@@ -125,7 +124,6 @@ class GoogleScraper:
             'health data breach', 'medical logistics',
             'cold chain disruption', 'water contamination',
             'fire evacuation', 'security incident',
-            'arson', 'sabotage'
         ],
 
         'defense': 
@@ -137,8 +135,7 @@ class GoogleScraper:
             'radar site', 'air defence', 'missile system',
             'drone', 'UAV', 'military aircraft', 'arms factory',
             'restricted area', 'secure facility', 'perimeter breach',
-            'explosive device', 'arson', 'military attack',
-            'sabotage', 'covert reconnaissance', 'military sabotage'
+            'explosive device', 'military attack'
         ],
 
         'cybersecurity': 
@@ -173,19 +170,18 @@ class GoogleScraper:
     
     # Common countries that might be mentioned
     COUNTRY_KEYWORDS = {
-        'ukraine', 'poland', 'germany', 'france', 'uk', 'united kingdom', 'great britain', 'england', 'britain', 'usa', 'us', 'united states',
-        'estonia', 'latvia', 'lithuania', 'czech', 'slovakia', 'romania', 'bulgaria',
-        'finland', 'sweden', 'norway', 'denmark', 'netherlands', 'belgium', 'spain',
-        'italy', 'greece', 'portugal', 'moldova', 'georgia', 'turkey', 'austria', 'switzerland'
+        'ukraine', 'poland', 'germany', 'france', 'uk', 'united kingdom', 'great britain', 'england', 'britain',
+        'estonia', 'latvia', 'lithuania', 'czech', 'czechia', 'czech republic','slovakia', 'romania', 'bulgaria',
+        'finland', 'sweden', 'norway', 'denmark', 'netherlands', 'belgium', 'spain', 'luxembourg', 'hungary',
+        'italy', 'greece', 'portugal', 'moldova', 'austria', 'switzerland'
     }
     
     # Security service identifiers
     SECURITY_SERVICES = {
-        'direct': ['gru', 'svr', 'fsb', 'gpu', 'russian intelligence',
-                   'military intelligence', 'foreign intelligence'],
-        'proxy': ['hacker group', 'cybercriminal', 'activist',
-                  'separatist', 'militia', 'drug dealer', 'drug lord', 
-                  'criminal', 'felon', 'extremist', 'extremists', 'extremist group', 'extremist groups'
+        'direct': ['gru', 'svr', 'fsb', 'russian intelligence'],
+        'proxy': ['hacker group', 'cybercriminal', 'activist', 'drug', 'criminal group', 'criminals',
+                  'separatist', 'militia', 'drug dealer', 'drug lord', 'gang', 'gangs', 'recruit', 'traitor',
+                  'criminal', 'felon', 'extremist', 'extremists', 'extremist group', 'extremist groups',
                   'ultranationalist', 'ultranationalists', 'ultranationalist group', 'ultranationalist groups']
     }
     
@@ -302,7 +298,7 @@ class GoogleScraper:
             # Silently continue if T&C handling fails
             pass
     
-    def search_google(self, query: str, start_date: str, end_date: str, max_results: int = 100) -> List[Article]:
+    def search_google(self, query: str, start_date: str, end_date: str, max_results: int = 1000) -> List[Article]:
         """
         Search Google with date filtering.
         
@@ -317,7 +313,7 @@ class GoogleScraper:
         """
         articles = []
         results_per_page = 10
-        max_pages = 10  # Limit to first 10 pages
+        max_pages = 30  # Limit to first 30 pages
         pages_needed = min((max_results + results_per_page - 1) // results_per_page, max_pages)
         
         logger.info(f"Searching Google for '{query}' from {start_date} to {end_date}...")
@@ -850,13 +846,13 @@ class GoogleScraper:
                             if texts:
                                 # Use the longest text as it's likely the main content
                                 content_text = max(texts, key=lambda x: x[1])[0]
-                                if len(content_text) > 500:  # Reasonable content length
+                                if len(content_text) > 1000:  # Reasonable content length
                                     break
                 except Exception:
                     continue
             
             # If no good content found, try getting body but exclude footer/nav
-            if not content_text or len(content_text) < 500:
+            if not content_text or len(content_text) < 1000:
                 try:
                     body = self.driver.find_element(By.TAG_NAME, 'body')
                     # Try to get main content area, excluding footer
@@ -1138,8 +1134,10 @@ class GoogleScraper:
         mapping = {
             'uk': 'United Kingdom',
             'britain': 'United Kingdom',
-            'usa': 'United States',
-            'united states': 'United States',
+            'gb': 'United Kingdom',
+            'great britain': 'United Kingdom',
+            'england': 'United Kingdom',
+            'britain': 'United Kingdom',
             'ukraine': 'Ukraine',
             'poland': 'Poland',
             'germany': 'Germany',
@@ -1148,6 +1146,8 @@ class GoogleScraper:
             'latvia': 'Latvia',
             'lithuania': 'Lithuania',
             'czech': 'Czech Republic',
+            'czechia': 'Czech Republic',
+            'czech republic': 'Czech Republic',
             'slovakia': 'Slovakia',
             'romania': 'Romania',
             'bulgaria': 'Bulgaria',
@@ -1162,7 +1162,8 @@ class GoogleScraper:
             'greece': 'Greece',
             'portugal': 'Portugal',
             'moldova': 'Moldova',
-            'georgia': 'Georgia',
+            'luxembourg': 'Luxembourg',
+            'hungary': 'Hungary'
         }
         
         country_lower = country.lower()
@@ -1532,7 +1533,6 @@ class DataVisualizer:
                 'fuel pipeline', 'airport',
                 'runway', 'air traffic control',
                 'fire at depot', 'explosion',
-                'sabotage', 'arson'
             ],
             'telecommunications': [
                 'telecom exchange', 'telephone exchange',
@@ -1544,9 +1544,7 @@ class DataVisualizer:
                 'cable landing station', 'backbone network',
                 'microwave link', 'satellite link',
                 'routing outage', 'BGP hijack',
-                'cable cut', 'telecom sabotage',
-                'network disruption', 'explosion',
-                'arson'
+                'cable cut', 'network disruption'
             ],
             'finance': [
                 'bank', 'central bank', 'payment system',
@@ -1558,8 +1556,7 @@ class DataVisualizer:
                 'financial cyberattack', 'DDoS extortion',
                 'data breach', 'ransom payment',
                 'crypto exchange', 'illicit finance',
-                'state-sponsored attack', 'insider threat',
-                'arson', 'sabotage'
+                'state-sponsored attack', 'insider threat'
             ],
             'healthcare': [
                 'hospital', 'medical centre', 'emergency department',
@@ -1570,8 +1567,7 @@ class DataVisualizer:
                 'backup generator failure', 'hospital ransomware',
                 'health data breach', 'medical logistics',
                 'cold chain disruption', 'water contamination',
-                'fire evacuation', 'security incident',
-                'arson', 'sabotage'
+                'fire evacuation', 'security incident'
             ],
             'defense': [
                 'military base', 'airbase', 'naval base', 'barracks',
@@ -1581,8 +1577,8 @@ class DataVisualizer:
                 'radar site', 'air defence', 'missile system',
                 'drone', 'UAV', 'military aircraft', 'arms factory',
                 'restricted area', 'secure facility', 'perimeter breach',
-                'explosive device', 'arson', 'military attack',
-                'sabotage', 'covert reconnaissance', 'military sabotage'
+                'explosive device', 'military attack',
+                'covert reconnaissance', 'military sabotage'
             ],
             'cybersecurity': [
                 'cyber sabotage', 'wiper malware', 'ransomware', 'DDoS',
@@ -1601,8 +1597,8 @@ class DataVisualizer:
                 'ammunition factory', 'drone factory', 'aerospace plant',
                 'shipyard', 'railcar factory', 'machinery plant', 'transformer factory',
                 'cable factory', 'electronics plant', 'warehouse', 'logistics depot',
-                'distribution centre', 'industrial fire', 'arson attack', 'equipment sabotage',
-                'production halt', 'supply chain disruption', 'explosion', 'sabotage'
+                'distribution centre', 'industrial fire',
+                'production halt', 'supply chain disruption'
             ],
             'government': [
                 'government building', 'ministry', 'defence ministry', 'interior ministry',
@@ -1611,8 +1607,7 @@ class DataVisualizer:
                 'border police', 'border guard', 'customs service', 'national police',
                 'gendarmerie', 'security service', 'intelligence service', 'counterintelligence',
                 'civil protection', 'emergency management', 'critical infrastructure authority',
-                'classified facility', 'secure compound', 'perimeter breach', 'arson',
-                'explosive device', 'sabotage'
+                'classified facility', 'secure compound', 'perimeter breach'
             ],
         }
         
@@ -2000,7 +1995,7 @@ def main():
     query = "Russian Sabotage -YouTube -Vimeo -Instagram -TikTok"
     start_date = "2020-01-01"
     end_date = "2026-12-31"
-    max_results = 100
+    max_results = 1000
     headless = False  # Set to True to run without browser window
     
     # Scrape Google results
